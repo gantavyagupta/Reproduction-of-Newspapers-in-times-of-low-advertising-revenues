@@ -1,0 +1,204 @@
+---
+title: 'A Reproduction of “Newspapers in times of low advertising revenues” by Charles
+  Angelucci and Julia Cage '
+author: "Gantavya Gupta"
+date: "5 January 2021"
+output:
+  pdf_document:
+         latex_engine: xelatex
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Abstract
+In this report, I will be reproducing the work done by Charles Angelucci and Julia Cage in their paper “Newspapers in times of low advertising revenues” which tries to model the relationship between the advertising revenues and newspapers’ choices regarding the size of their newsroom, the quantity of news to produce, and their pricing strategies. It tries to investigate the consequences of a decline in advertisers’ willingness to pay for readers’ attention triggered by the arrival of an alternative advertising platform. The empirical analysis that I carried out employs a difference-in-differences design to compare the change in advertising revenues of national daily newspapers to that of local daily newspapers over the same period.
+
+
+## Keywords
+•	Newspapers  
+  
+•	Advertising revenue 
+  
+•	Local and national newspapers 
+  
+•	Journalists  
+  
+•	Ordinary Least Squares (OLS) Regression 
+  
+•	Difference in difference approach 
+  
+
+\newpage
+
+## Introduction
+Legacy newspaper companies have progressively reduced the engagement of journalists in recent times and there are mounting apprehensions about this business’s capability to reap superior information as observed through reduced newsrooms, scarcer inspective journalists, and augmented dependence on cable amenities. within the us, the typical number of journalists per newspaper has fallen drastically from 39 (2001) to 23.5 (2015). The US newspaper advertising revenues have withered from nearly $50 billion in 2000 to but $20 billion now and therefore the share of advertisement in total revenues has deteriorated from 82 to 65 percent. With the increase of internet, the way with which the producers of stories, i.e. the journalists produce and also the consumers of stories, the audience perceive it's been immensely impacted by the rapid evolution of technology. There has been a comprehensive agreement that the newspaper industry is during a state of economic disorder with reasons still under speculation and competition. Few of them being the journalists losing their jobs thanks to rapid take-over by internet within the information sector resulting in a fall within the advertising revenues for the newspaper companies.
+
+The empirical analysis employs a difference-in-differences design to match the change in advertising revenues of national daily newspapers thereto of local daily newspapers over the identical period. The change in willingness to pay by advertisers’ is accounted post the French government announcing that it might relax long-standing regulations that prohibited television advertising in 1967. While advertisements in local newspapers tend to feature commercials or promote local establishments, national ads provide a bigger fraction of revenue for national newspapers than for local ones. National newspapers were therefore the treatment group and native newspapers were the control group. The empirical analysis was administrated to check whether the policy implication had any difference in its impact on national and native newspapers.
+
+The analysis is critical because it has inferences for the fashionable media commerce and current deliberations about the standard of twenty-first-century journalism. It governs that a decrease in advertisers’ willingness to procure readers’ attention may reduce a media company’s incentives to speculate in news quality.
+
+It was revealed that in many cases there appears to be a difference from 1967 onward. In general, I’ve got been ready to obtain results that are almost like Angelucci and Cagé, 2019.
+
+\newpage
+
+## Data
+The raw data for the replication has been provided by the authors on openicpsr.org. There are 1,196 observations in the dataset and 52 variables. The data is for the 1960-1974-time period and has around 100 newspapers. There are 14 national newspapers at the beginning of the period and 12 at the end. The data was collected and the 13 relevant variables i.e. year, id_news, local, national,	after_national, po_cst, ps_cst, ra_cst, rs_cst, qs_s, qtotal, ads_s, ads_p4_cst, ra_cst_div_qtotal had been chosen to carry out the analysis. 
+
+These variables are important because they represent the advertisement and consumer side story for our analysis where we carry out an OLS Regression in a Difference-in-Difference approach.
+
+I converted the dataset from dta format to csv using Jupyter notebook (code-attached at the end) and then imported the csv in R and then performed the regression analysis. The 13 chosen columns were read from the csv and used for the analysis.
+
+
+
+## Model
+I now determine empirically how the various choices and outcomes as mentioned above are affected by newspapers’ reliance on advertising revenues. This paper is the first to use quasi-natural experiment and Difference in difference approach.
+
+
+
+### Estimation Strategy
+The panel data is used to compute DiD estimates of the effect of the introduction of advertising on television. Let Dnational news be an indicator variable for national newspapers and Dafter be a time dummy that switches on for observations post 1967 (i.e., the year the reform is announced). The analysis is based on the following regression equation:
+
+y~n,t~ = $\alpha$ + $\beta$~1~(D~after~× D~national_news~) + $\lambda$~n~ + $\gamma$~t~ + $\epsilon$~n,t~
+
+where n indexes newspapers and t indexes years (t = 1960,…,1974). For all specifications in the analysis, the fixed effects for newspaper are given by $\lambda$~n and include variables such as id_news and time dummies are given by γt including year. The term $\epsilon$~n,t~ is a newspaper-year shock. Standard errors are clustered at the newspaper level. The variable y~n,t~ is our outcome of interest i.e. Subscription price, Unit price, Circulation, Share of sub, Revenue from sales, ad_revenue, ad_space, ad price, ad revenue divided by circulation.
+
+The key identifying assumption here is that the trends of the dependent variables would be the same for both categories of newspapers (local and national) in the absence of the treatment.
+
+In all the specifications, we use the logarithms of the dependent variable.
+
+The effect of the introduction of advertising on television is first captured on the advertising side of the market i.e. advertising revenues, price, and quantity. Then, the impact is determined for prices on the reader side, and final the content and size of the newsroom choices. Due to the inclusion of newspaper and year fixed effects, the coefficient β1, the coefficient of interest measures the annual effect for national newspapers of the introduction of advertising on television.
+
+The unbiasedness of the DiD estimates is ensured by the strict exogeneity of the introduction of advertising on television. French television was state-owned from 1945 to 1981. Therefore, no interaction occurred between television owners and newspaper owners, whether national or local. This decision was exogenous to the newspaper industry.
+
+
+\newpage
+  
+## Results
+1. Effect on the Advertising Side of the Market
+
+```{r, echo= FALSE}
+newspaper <- read.csv("Dataset.csv")
+
+ad_revenue <- lm(log(ra_cst) ~ after_national + id_news + year, data = newspaper)
+ad_revenue_div_circulation <- lm(log(ra_cst_div_qtotal) ~ after_national + id_news + year, data = newspaper)
+ad_price <- lm(log(ads_p4_cst) ~ after_national + id_news + year, data = newspaper)
+ad_space <- lm(log(ads_s) ~ after_national + id_news + year, data = newspaper)
+subscription_price <- lm(log(ps_cst) ~ after_national + id_news + year, data = newspaper)
+unit_price <- lm(log(po_cst) ~ after_national + id_news + year, data = newspaper)
+circulation <- lm(log(qtotal) ~ after_national + id_news + year, data = newspaper)
+share_of_sub <- lm(log(qs_s) ~ after_national + id_news + year, data = newspaper)
+revenue_from_sales <- lm(log(rs_cst) ~ after_national + id_news + year, data = newspaper)
+
+huxtable::huxreg("Ad. rev." = ad_revenue, "Ad rev. div. circ." = ad_revenue_div_circulation, "Ad price" = ad_price, "Ad space" = ad_space, number_format = 2)
+```
+It is clearly visible that revenue from advertisement is negatively related to the coefficient $\beta$~1 which is significant, implying that the national newspapers do have a higher fall in revenue per unit journalistic intensive content.         
+
+2. Effect on the Reader Side of the Market
+
+```{r pressure, echo=FALSE}
+huxtable::huxreg("Subscription price" = subscription_price, 
+        "Unit price" = unit_price, 
+        "Circulation" = circulation, 
+        "Share of sub" = share_of_sub,
+        "Revenue from sales" = revenue_from_sales, number_format = 2)
+```
+
+  
+The readers’ side of the market has also seen an impact on national newspapers as the variable Share_of_sub is significant.
+The β1 coefficient for subscription price, though insignificant, is negative.
+
+\newpage
+
+## Discussion
+Here, we examine the magnitudes of a degeneration in the publicists’ readiness to pay for newspaper readers’ responsiveness prompted by the influx of new-fangled advertising podiums. Facebook and Google in 2015 had seized nearly two-thirds of the $60 billion virtual advertising marketplace. This modification in advertising incomes in the direction of social media has backed to a breakdown in newspaper advertising returns.
+
+To examine the impression of these shockwaves, the authors had built a modest model in which a newspaper sells content to readers, and also trades reader responsiveness to promoters. It is shown through the regression analysis that a fall in the advertisers’ readiness to pay for reader’ attention persuades the newspaper to decline the eminence of its content. Advertisers’ lesser disposition to reimburse for newspaper readers leads to a lesser amount of 'subsidization' of readers over small amounts, creating a mounting burden on reader prices, it also leads to less 'subsidization' of quality. Whenever readers are appropriately profound to eminence, a deterioration in advertising revenues leads to a reduction in subscription fees to pay off readers for inferior quality. A fall in advertisers’ inclination to pay intensifies the newspaper company’s motivation to price discriminate among readers.
+
+Newspapers have seen deteriorating circulation numbers and diminishing advertising revenues for several years. Specifically, falling advertising statistics put a risk on newspapers – for example, in the US where 73% of their revenues are generated through advertising. Several businesses have extended their advertising spending towards online. Subsequently, there are apprehensions about online advertising replacing newspaper advertising as in the same way as it has been dreaded for many years for the readership lateral. Both conceivable effects might put a peril on the supplementary existence of (print) newspapers. However, even though the internet in comparison to the newspapers offers a variety of advantages for advertising companies, replacement propensities cannot be generalized.
+
+For further steps, we could analyse for the degree of impact a shift from print to online media can cause. Policy interventions that focus on the promotion of print media should be analysed and it should be an area of focus how more policies with the same agenda can come into play so that no source of mass communication is compromised on the quality. 
+
+
+
+## Conclusion
+Media that are completely or partially financed by advertising revenues face a two-sided market condition. They trade their merchandise to 2 separate customer groups: audience and advertisers. Between these two groups of consumers, indirect network effects exist. a bigger involvement of the customer group ‘audience’ upsurges the welfares of the patron group advertisers as their ads reach a bigger audience. This fundamental situation is identical for offline media like newspapers and online media.
+
+Regarding the interrogation of substitution tendencies between newspapers and therefore the internet, the bulk of research has to this point been conducted on the audience side. However, as mentioned within the introduction, revenue-wise the advertising side in some countries is more important for publishing houses. The newspaper industry is within the midst of a severe crisis. an element often invoked to elucidate this state of distress is that the strong come by advertising revenues legacy newspapers have experienced following the appearance of the net. Concomitant to the current decrease in advertising revenues, the industry’s business model is evolving with, among other changes, a bent for newspapers to cut back the dimensions of their newsroom. 
+
+I've successfully shown that few variables like advertisement revenue per unit journalism intensive content are different for national newspapers than local newspapers post the implication of policy that allowed for the advertisements on televisions.
+
+\newpage
+
+## References:
+1. Henry 2007, Starkman 2014, Hamilton 2016
+2. American Society of News Editors
+3. The Production of Information in an Online World: Is Copy Right?
+4. Hamilton, James, All the News That’s Fit to Shell: How the Market Transforms Information Into News, Princeton University Press, 2004.
+5. Kennedy, Patrick and Andrea Prat, “Where Do People Get Their News?,” Working Paper 2017.
+6. Schudson, Michael, Discovering the News: A Social History of American Newspapers, Basic
+Books, 1981. 
+7. Digitization and the Quality of New Media Products: The Case of Music,” in “Economic
+8. Analysis of the Digital Economy,” University of Chicago Press, 2015, pp. 407–442. 8. George, Lisa M, “The Internet and the Market for Daily Newspapers,” The B.E. Journal of Economic Analysis & Policy, 2008, 8 (1), 1–33.
+9. “Local News Online: Aggregators, Geo-Targeting and the Market for Local News,” Working Paper 2013
+10. Cag´e, Julia, “Media Competition, Information Provision and Political Participation: Evidence from French Local Newspapers and Elections, 1944-2014,” CEPR Discussion Papers,12198, C.E.P.R. Discussion Papers 2017
+
+
+
+## Appendix:
+
+```{r appendix, eval=FALSE}
+#Jupyter code to convert .dta file to .csv
+import pandas as pd
+data = pd.io.stata.read_stata('Angelucci_Cage_AEJMicro_Descriptive_evidence_US.dta')
+data.to_csv('dataset.csv')
+ 
+#reading the csv file in R Markdown
+newspaper <- read.csv("Dataset.csv")
+
+
+
+#running the regression for advertising side
+ad_revenue <- lm(log(ra_cst) ~ after_national + id_news + year, 
+                 data = newspaper)
+ad_revenue_div_circulation <- lm(log(ra_cst_div_qtotal) ~ after_national 
+                                 + id_news  + year, 
+                                 data = newspaper)
+ad_price <- lm(log(ads_p4_cst) ~ after_national + id_news + year, 
+               data = newspaper)
+ad_space <- lm(log(ads_s) ~ after_national + id_news + year, 
+               data = newspaper)
+
+#running the regression for readers’ side
+subscription_price <- lm(log(ps_cst) ~ after_national + id_news + year, 
+                         data = newspaper)
+unit_price <- lm(log(po_cst) ~ after_national + id_news + year, 
+                 data = newspaper)
+circulation <- lm(log(qtotal) ~ after_national + id_news + year, 
+                  data = newspaper)
+share_of_sub <- lm(log(qs_s) ~ after_national + id_news + year, 
+                   data = newspaper)
+revenue_from_sales <- lm(log(rs_cst) ~ after_national + id_news + year, 
+                         data = newspaper)
+
+
+
+ 
+ 
+#tabular representation for the first regression
+huxtable::huxreg("Ad. rev." = ad_revenue, 
+                 "Ad rev. div. circ." = ad_revenue_div_circulation, 
+                 "Ad price" = ad_price, 
+                 "Ad space" = ad_space, number_format = 2)
+ 
+#tabular representation for the second regression
+huxtable::huxreg("Subscription price" = subscription_price, 
+        "Unit price" = unit_price, 
+        "Circulation" = circulation, 
+        "Share of sub" = share_of_sub,
+        "Revenue from sales" = revenue_from_sales, number_format = 2)
+
+
+```
