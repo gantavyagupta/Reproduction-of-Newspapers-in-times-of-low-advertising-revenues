@@ -1,4 +1,5 @@
-# STA304-PS5-Reproduction-of-Option-C-i-
+# Reproduction-of-Newspapers-in-times-of-low-advertising-revenues
 
 
-#Discussion
+Reproduction of Newspapers in times of low advertising revenues using OLS (ordinary least squares) where the researchers used difference-in-differences approach to understand the impact on Newspaper revenues when TV advertising came in. 
+
